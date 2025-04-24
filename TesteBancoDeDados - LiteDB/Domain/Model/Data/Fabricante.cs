@@ -1,5 +1,4 @@
 ﻿using LiteDB;
-using TesteBancoDeDados___LiteDB.Mappers;
 
 namespace TesteBancoDeDados___LiteDB.Domain.Model.Data
 {

@@ -2,9 +2,9 @@
 
 namespace TesteBancoDeDados___LiteDB.Domain.Model.Data;
 
-internal class DiametroTipo
+internal class Bloco
 {
     [BsonId]
     public int Id { get; set; }
-    public string Descricao { get; set; }
+    public string Nome { get; set; }
 }

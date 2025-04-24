@@ -10,12 +10,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Ui\ViewModel\" />
-    <Folder Include="Ui\View\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="LiteDB" Version="5.0.21" />
+    <PackageReference Include="Prism.Core" Version="9.0.537" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,16 @@
+﻿<Window x:Class="TesteBancoDeDados___LiteDB.Ui.View.AdicionarFabricante"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TesteBancoDeDados___LiteDB.Ui.View"
+        mc:Ignorable="d"
+        Title="AdicionarFabricante"
+        Height="120" Width="200">
+    <StackPanel>
+        <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
+        <TextBox Margin="3" Text="{Binding Nome}" />
+        <CheckBox Margin="3" Content="Grupo Preferencial" IsChecked="{Binding GrupoPreferencial}" />
+        <Button Margin="3" Command="{Binding Salvar}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Content="Salvar" />
+    </StackPanel>
+</Window>
