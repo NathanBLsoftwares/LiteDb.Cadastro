@@ -15,11 +15,11 @@ using System.Windows.Shapes;
 namespace TesteBancoDeDados___LiteDB.Ui.View
 {
     /// <summary>
-    /// Lógica interna para AdicionarGrupoView.xaml
+    /// Lógica interna para AdicionarLinhaView.xaml
     /// </summary>
-    public partial class AdicionarGrupoView : Window
+    public partial class LinhaView : Window
     {
-        public AdicionarGrupoView()
+        public LinhaView()
         {
             InitializeComponent();
         }

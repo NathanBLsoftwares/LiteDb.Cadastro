@@ -1,0 +1,18 @@
+﻿<Window x:Class="TesteBancoDeDados___LiteDB.Ui.View.FabricanteView"
+       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+       xmlns:vm="clr-namespace:TesteBancoDeDados___LiteDB.Ui.ViewModel"
+       xmlns:local="clr-namespace:TesteBancoDeDados___LiteDB.Ui.View"
+       mc:Ignorable="d"
+       d:DataContext="{d:DesignInstance Type=vm:FabricanteViewModel, IsDesignTimeCreatable=False}"
+       Title="Fabricante" 
+        SizeToContent="Height"
+       Height="150" Width="220">
+   <StackPanel>
+       <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
+        <TextBox Margin="3" Text="{Binding Nome}" />
+        <Button Margin="3" Command="{Binding Salvar}" Content="Salvar" />
+   </StackPanel>
+</Window>

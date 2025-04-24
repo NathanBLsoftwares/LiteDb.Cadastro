@@ -1,12 +1,12 @@
-﻿<Window x:Class="TesteBancoDeDados___LiteDB.Ui.View.AdicionarFabricante"
+﻿<Window x:Class="TesteBancoDeDados___LiteDB.Ui.View.GrupoView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:TesteBancoDeDados___LiteDB.Ui.View"
         mc:Ignorable="d"
-        Title="AdicionarFabricante"
-        Height="120" Width="200">
+        Title="GrupoView"
+        Height="150" Width="200">
     <StackPanel>
         <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
         <TextBox Margin="3" Text="{Binding Nome}" />

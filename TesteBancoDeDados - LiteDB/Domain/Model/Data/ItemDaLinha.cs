@@ -10,4 +10,8 @@ internal class ItemDaLinha
     public string Nome { get; set; }
     [BsonRef($"{MapDataBase.Linha}")]
     public Linha Linha { get; set; }
+    public override string ToString()
+    {
+        return Nome;
+    }
 }

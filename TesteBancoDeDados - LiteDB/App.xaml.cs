@@ -1,6 +1,7 @@
-﻿using System.Configuration;
-using System.Data;
+﻿using Microsoft.Azure.Batch;
 using System.Windows;
+using TesteBancoDeDados___LiteDB.Ui.View;
+using TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
 namespace TesteBancoDeDados___LiteDB
 {

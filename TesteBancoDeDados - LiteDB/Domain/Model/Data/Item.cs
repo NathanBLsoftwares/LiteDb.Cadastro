@@ -14,4 +14,8 @@ internal class Item
     public DiametroTipo Diametro { get; set; }
     [BsonRef($"{MapDataBase.Bloco}")]
     public Bloco Blocos { get; set; }
+    public override string ToString()
+    {
+        return Nome;
+    }
 }

@@ -10,4 +10,8 @@ internal class Linha
     public string Nome { get; set; }
     [BsonRef($"{MapDataBase.Grupo}")]
     public Grupo Grupo { get; set; }
+    public override string ToString()
+    {
+        return Nome;
+    }
 }
