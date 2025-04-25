@@ -18,7 +18,7 @@ internal class CadastroLinhasViewModel : BindableBase
 
     public LiteDatabase Db { get; private set; }
     public ILiteCollection<Fabricante> FabricantesDb { get; private set; }
-    public ILiteCollection<Linha> LinhasDb { get; private set; }
+    
     public ObservableCollection<Fabricante> Fabricantes { get; set; }
     public Fabricante Fabricante { get => fabricante; set => fabricante = value; }
 
@@ -47,16 +47,37 @@ internal class CadastroLinhasViewModel : BindableBase
     public DelegateCommand BotaoEditarGrupo => botaoEditarGrupo ?? (botaoEditarGrupo = new DelegateCommand(EditarGrupo));
     #endregion ATRIBUTO GRUPO
 
+    #region ATRIBUTOS LINHA
+    private DelegateCommand botaoAdicionarLinha;
+    private DelegateCommand botaoExcluirLinha;
+    private DelegateCommand botaoEditarLinha;
+    private Linha linha;
+
+
+    public ILiteCollection<Linha> LinhasDb { get; private set; }
+    public ObservableCollection<Linha> Linhas { get; private set; }
+    public Linha Linha { get => linha; set => linha = value; }
+
+
+    public DelegateCommand BotaoAdicionarLinha => botaoAdicionarLinha ?? (botaoAdicionarLinha = new DelegateCommand(AdicionarLinha));
+    public DelegateCommand BotaoEditarLinha => botaoEditarLinha ?? (botaoEditarLinha = new DelegateCommand(ExecuteBotaoEditarLinha));
+    public DelegateCommand BotaoExcluirLinha => botaoExcluirLinha ?? (botaoExcluirLinha = new DelegateCommand(ExcluirLinha));
+   
+
+    #endregion ATRIBUTOS LINHA
+
+
 
     #region CONSTRUTORA E DESTRUTORA
     public CadastroLinhasViewModel()
     {
         Fabricantes = new ObservableCollection<Fabricante>();
         Grupos = new ObservableCollection<Grupo>();
+        Linhas = new ObservableCollection<Linha>();
         Db = new LiteDatabase("Banco.db");
         CarregaFabricantesDB();
         CarregarGruposDB();
-        LinhasDb = Db.GetCollection<Linha>(Mappers.MapDataBase.Linha);
+        CarregarLinhasDB();   
     }
 
     ~CadastroLinhasViewModel()
@@ -66,6 +87,20 @@ internal class CadastroLinhasViewModel : BindableBase
     #endregion CONSTRUTORA E DESTRUTORA
 
     #region CARREGAR BANCO DE DADOS
+    public void CarregarLinhasDB()
+    {
+        Linhas.Clear();
+        linha = null;
+        LinhasDb = Db.GetCollection<Linha>(Mappers.MapDataBase.Linha);
+        if(LinhasDb.Count() > 0)
+        {
+            foreach(var item in LinhasDb.FindAll())
+            {
+                Linhas.Add(item);
+            }
+        }
+    }
+
     private void CarregaFabricantesDB()
     {
         Fabricantes.Clear();
@@ -97,6 +132,7 @@ internal class CadastroLinhasViewModel : BindableBase
         Grupo = Grupos.FirstOrDefault();
     }
     #endregion CARREGAR BANCO DE DADOS
+
 
 
     #region COMANDOS FABRICANTES
@@ -203,4 +239,25 @@ internal class CadastroLinhasViewModel : BindableBase
         }
     }
     #endregion COMANDOS GRUPOS
+
+    #region COMANDOS LINHA
+
+
+    void ExecuteBotaoEditarLinha()
+    {
+
+    }
+
+    void ExcluirLinha()
+    {
+
+    }
+    
+
+    void AdicionarLinha()
+    {
+
+    }
+
+    #endregion COMANDOS LINHA
 }
