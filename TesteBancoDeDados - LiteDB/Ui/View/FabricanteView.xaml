@@ -8,11 +8,11 @@
        mc:Ignorable="d"
        d:DataContext="{d:DesignInstance Type=vm:FabricanteViewModel, IsDesignTimeCreatable=False}"
        Title="Fabricante" 
-        SizeToContent="Height"
+       SizeToContent="Height"
        Height="150" Width="220">
    <StackPanel>
        <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
         <TextBox Margin="3" Text="{Binding Nome}" />
-        <Button Margin="3" Command="{Binding Salvar}" Content="Salvar" />
+        <Button Margin="3" Command="{Binding Salvar}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Content="Salvar" />
    </StackPanel>
 </Window>

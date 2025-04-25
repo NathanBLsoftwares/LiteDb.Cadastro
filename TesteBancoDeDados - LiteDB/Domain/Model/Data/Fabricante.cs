@@ -9,7 +9,7 @@ namespace TesteBancoDeDados___LiteDB.Domain.Model.Data
         public string Nome { get; set; }
 
         public override string ToString()
-        {
+        {     
             return Nome;
         }
     }

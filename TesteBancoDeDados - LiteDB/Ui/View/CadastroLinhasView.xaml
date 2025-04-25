@@ -31,12 +31,12 @@
                         <TextBlock Margin="3" HorizontalAlignment="Center" Text="Excluir" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <Button Margin="3" Command="{Binding BotaoAdicionarFabricante, ConverterParameter=Fabricantes}" DockPanel.Dock="Right">
+                <Button Margin="3" Command="{Binding BotaoAdicionarFabricante}" DockPanel.Dock="Right">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="3" HorizontalAlignment="Center" Text="Adicionar" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <ComboBox Margin="3" DisplayMemberPath="Name" ItemsSource="{Binding Fabricantes}" SelectedItem="{Binding Fabricante}"/>
+                <ComboBox Margin="3" ItemsSource="{Binding Fabricantes}" SelectedItem="{Binding Fabricante}"/>
             </DockPanel>
         </GroupBox>
         

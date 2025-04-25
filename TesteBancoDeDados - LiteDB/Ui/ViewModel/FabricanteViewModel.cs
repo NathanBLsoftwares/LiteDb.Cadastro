@@ -1,41 +1,69 @@
 ﻿using LiteDB;
-using Microsoft.VisualStudio.Services.Common;
 using System.Windows;
-using TesteBancoDeDados___LiteDB.Domain.Model;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
-internal class FabricanteViewModel : Deriva
+internal class FabricanteViewModel : BindableBase
 {
+
     private ILiteCollection<Fabricante> fabricantes;
-
-    public FabricanteViewModel(ILiteCollection<Fabricante> fabricantes)
-    {
-        this.fabricantes = fabricantes;
-    }
-
+    private Fabricante fabricanteSelecionado;
+    private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
     private string nome;
 
+
+
+    public bool SalvouComSucesso { get; private set; } = false;
+    public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(ExecuteSalvar));
     public string Nome { get => nome; set => SetProperty(ref nome, value); }
 
-    private DelegateCommand salvar;
-    public DelegateCommand Salvar =>
-        salvar ?? (salvar = new DelegateCommand(ExecuteSalvar));
 
-    void ExecuteSalvar()
+
+    public FabricanteViewModel(ILiteCollection<Fabricante> fabricantes, Fabricante fabricante = null)
     {
-        if (string.IsNullOrEmpty(Nome))
+        this.fabricantes = fabricantes;
+        fabricanteSelecionado = fabricante;
+    }
+
+    void ExecuteSalvar(Domain.Library.Services.Dialog.IDialogService service)
+    {
+        if (service == null)
         {
-            MessageBox.Show("Nome Inválido");
+            service.DialogResult = false;
             return;
         }
-        if (fabricantes.Exists(x => x.Nome == Nome))
+        else
         {
-            MessageBox.Show("Fabricante já Cadastrado");
-            return;
+            if (string.IsNullOrWhiteSpace(Nome))
+            {
+                MessageBox.Show("O campo Nomes deve ser preenchido", "Atenção", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+            if (fabricantes.Exists(x => x.Nome == Nome))
+            {
+                MessageBox.Show("Fabricante já Cadastrado", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            if (fabricanteSelecionado != null)
+            {
+                fabricanteSelecionado.Nome = Nome;
+                if (!fabricantes.Update(fabricanteSelecionado))
+                {
+                    MessageBox.Show("Erro ao alterar nome do Fabricante", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+            }
+            else
+            {
+                fabricantes.Insert(new Fabricante { Nome = Nome });
+            }
+
+            SalvouComSucesso = true;
+            service.DialogResult = true;
+            service.Close();
         }
 
-        fabricantes.Insert(new Fabricante { Nome = Nome });
     }
 }
