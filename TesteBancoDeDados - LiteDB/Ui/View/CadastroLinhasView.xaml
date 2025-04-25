@@ -57,7 +57,7 @@
                         <TextBlock Margin="3" HorizontalAlignment="Center" Text="Adicionar" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <ComboBox Margin="3" DisplayMemberPath="Name" ItemsSource="{Binding Grupos}" SelectedItem="{Binding Grupo}"/>
+                <ComboBox Margin="3" ItemsSource="{Binding Grupos}" SelectedItem="{Binding Grupo}"/>
             </DockPanel>
         </GroupBox>
         

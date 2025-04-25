@@ -9,7 +9,7 @@
         Height="150" Width="200">
     <StackPanel>
         <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
-        <TextBox Margin="3" Text="{Binding Nome}" />
+        <TextBox Margin="3" Text="{Binding NomeGrupo}" />
         <CheckBox Margin="3" Content="Grupo Preferencial" IsChecked="{Binding GrupoPreferencial}" />
         <Button Margin="3" Command="{Binding Salvar}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}" Content="Salvar" />
     </StackPanel>
