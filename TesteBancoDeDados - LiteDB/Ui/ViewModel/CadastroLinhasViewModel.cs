@@ -69,20 +69,52 @@ internal class CadastroLinhasViewModel : BindableBase
     private DelegateCommand botaoAdicionarLinha;
     private DelegateCommand botaoExcluirLinha;
     private DelegateCommand botaoEditarLinha;
-    private Linha linhaSelecionada;
+    private Linha linha;
 
 
     public ILiteCollection<Linha> LinhasDb { get; private set; }
     public ObservableCollection<Linha> Linhas { get; private set; }
-    public Linha LinhaSelecionada { get => linhaSelecionada; set => linhaSelecionada = value; }
+    
+
+    public Linha Linha
+    {
+        get
+        {
+            return linha;
+        }
+
+        set
+        {
+            linha = value;
+            CarregarItemsDaLinhaDB();
+        }
+    }
 
 
     public DelegateCommand BotaoAdicionarLinha => botaoAdicionarLinha ?? (botaoAdicionarLinha = new DelegateCommand(AdicionarLinha));
     public DelegateCommand BotaoEditarLinha => botaoEditarLinha ?? (botaoEditarLinha = new DelegateCommand(EditarLinha));
     public DelegateCommand BotaoExcluirLinha => botaoExcluirLinha ?? (botaoExcluirLinha = new DelegateCommand(ExcluirLinha));
-   
+
 
     #endregion ATRIBUTOS LINHA
+
+    #region ATRIBUTO ITEM LINHA
+    private DelegateCommand adicionarItemLinha;
+    private DelegateCommand excluirItemLinha;
+    private ItemDaLinha itemLinha;
+
+
+    public ILiteCollection<ItemDaLinha> ItemDaLinhaDB { get; private set; }
+    public ItemDaLinha ItemLinha
+    {
+        get { return itemLinha; }
+        set { SetProperty(ref itemLinha, value); }
+    }
+    public ObservableCollection<ItemDaLinha> ItemsLinhas {  get; private set; }
+    public DelegateCommand AdicionarItemLinha => adicionarItemLinha ?? (adicionarItemLinha = new DelegateCommand(MAdicionarItemLinha));
+    public DelegateCommand ExcluirItemLinha => excluirItemLinha ?? (excluirItemLinha = new DelegateCommand(MExcluirItemLinha));
+    #endregion ATRIBUTO ITEM LINHA
+
 
 
 
@@ -92,10 +124,12 @@ internal class CadastroLinhasViewModel : BindableBase
         Fabricantes = new ObservableCollection<Fabricante>();
         Grupos = new ObservableCollection<Grupo>();
         Linhas = new ObservableCollection<Linha>();
+        ItemsLinhas = new ObservableCollection<ItemDaLinha>();
         Db = new LiteDatabase("Banco.db");
         CarregaFabricantesDB();
         CarregarGruposDB();
-        CarregarLinhasDB();   
+        CarregarLinhasDB();
+        CarregarItemsDaLinhaDB();
     }
 
     ~CadastroLinhasViewModel()
@@ -105,10 +139,27 @@ internal class CadastroLinhasViewModel : BindableBase
     #endregion CONSTRUTORA E DESTRUTORA
 
     #region CARREGAR BANCO DE DADOS
+
+    public void CarregarItemsDaLinhaDB(Linha _linhaSelecionada = null)
+    {
+        ItemsLinhas.Clear();
+        ItemLinha = null;
+        ItemDaLinhaDB = Db.GetCollection<ItemDaLinha>(Mappers.MapDataBase.ItemLinha);
+        if(ItemDaLinhaDB.Count() > 0)
+        {
+            foreach(var item in ItemDaLinhaDB.FindAll())
+            {
+                if(_linhaSelecionada != null && item.Linha.Id == _linhaSelecionada.Id)
+                {
+                    ItemsLinhas.Add(item);
+                }
+            }
+        }
+;   }
     public void CarregarLinhasDB(Grupo grupo = null)
     {
         Linhas.Clear();
-        LinhaSelecionada = null;
+        Linha = null;
         LinhasDb = Db.GetCollection<Linha>(Mappers.MapDataBase.Linha);
         if(LinhasDb.Count() > 0)
         {
@@ -292,11 +343,11 @@ internal class CadastroLinhasViewModel : BindableBase
 
     void EditarLinha()
     {
-        if (LinhaSelecionada == null)
+        if (Linha == null)
             return;
-        var dc = new LinhaViewModel(LinhasDb, Grupo, LinhaSelecionada)
+        var dc = new LinhaViewModel(LinhasDb, Grupo, Linha)
         {
-            NomeLinha = LinhaSelecionada.Nome
+            NomeLinha = Linha.Nome
         };
         var dlg = new LinhaView { DataContext = dc };
         if (dlg.ShowDialog() != true)
@@ -306,20 +357,44 @@ internal class CadastroLinhasViewModel : BindableBase
 
     void ExcluirLinha()
     {
-        if (LinhaSelecionada == null)
+        if (Linha == null)
             return;
-        var resultadoExcluirLinha = MessageBox.Show($"Tem certeza que deseja Excluir a linha '{LinhaSelecionada}'?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        var resultadoExcluirLinha = MessageBox.Show($"Tem certeza que deseja Excluir a linha '{Linha}'?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Warning);
         if(resultadoExcluirLinha == MessageBoxResult.Yes)
         {
-            LinhasDb.Delete(LinhaSelecionada.Id);
-            var linhaRemovida = Linhas.FirstOrDefault(x => x.Nome == LinhaSelecionada.Nome);
+            LinhasDb.Delete(Linha.Id);
+            var linhaRemovida = Linhas.FirstOrDefault(x => x.Nome == Linha.Nome);
             if(linhaRemovida != null)
             {
                 Linhas.Remove(linhaRemovida);
             }
-            LinhaSelecionada = null;
+            Linha = null;
         }
     }
-    
+
     #endregion COMANDOS LINHA
+    
+    #region COMANDOS ITEM LINHA
+    void MAdicionarItemLinha()
+    {
+        if (Linha == null)
+        {
+            MessageBox.Show("Selecione uma linha", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var dc = new ItemLinhaViewModel(ItemDaLinhaDB, Linha);
+        var dlg = new ItemLinhaView { DataContext = dc };
+        dlg.ShowDialog();
+        if (dc.SalvouItemLinhaCoMSucesso)
+        {
+            ItemDaLinha NovoItemLinha = ItemDaLinhaDB.FindAll();
+        }
+
+    }
+    void MExcluirItemLinha()
+    {
+
+    }
+    #endregion COMANDOS ITEM LINHAS
+
 }

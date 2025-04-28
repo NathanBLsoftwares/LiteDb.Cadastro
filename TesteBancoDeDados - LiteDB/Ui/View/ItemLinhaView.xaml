@@ -1,0 +1,29 @@
+﻿<Window x:Class="TesteBancoDeDados___LiteDB.Ui.View.ItemLinhaView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:TesteBancoDeDados___LiteDB.Ui.View"
+        mc:Ignorable="d"
+        Title="ItemLinhaView" Height="400" Width="300">
+    <StackPanel Margin="3" Orientation="Vertical">
+        <Label Content="Cadastro Item" Margin="3" HorizontalAlignment="Center" FontSize="20" FontFamily="Arial Black"/>
+        <TextBlock Text="Nome" Margin="3" TextWrapping="Wrap"/>
+        <TextBox Margin="3" Text="{Binding NomeItemDalinha}"/>
+        <TextBlock Text="Descrição" Margin="3" TextWrapping="Wrap"/>
+        <TextBox Margin="3" Text="{Binding DescricaoItemDaLinha}" Height="50"/>
+        <TextBlock Text="Grupo" Margin="3" TextWrapping="Wrap"/>
+        <ComboBox Margin="3" ItemsSource="{Binding GruposItemDaLinha}" SelectedItem="{Binding GrupoItemDaLinha}"/>
+        <TextBlock Text="Linha" Margin="3" TextWrapping="Wrap"/>
+        <ComboBox Margin="3" ItemsSource="{Binding LinhasItemDaLinha}" SelectedItem="{Binding LinhaItemDaLinha}"/>
+        <TextBlock Text="Diâmetro" Margin="3" TextWrapping="Wrap"/>
+        <ComboBox Margin="3" ItemsSource="{Binding DiametrosItemDaLinha}" SelectedValue="{Binding DiametroItemDaLinha}"/>
+        <DockPanel>
+            <Button Command="{Binding SalvarItemCadastrado}" Margin="3" DockPanel.Dock="Right">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Salvar"/>
+                </StackPanel>
+            </Button>
+        </DockPanel>
+    </StackPanel>
+</Window>

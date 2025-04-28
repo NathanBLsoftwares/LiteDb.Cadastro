@@ -85,7 +85,7 @@
         <GroupBox Grid.Row="3" Header="Itens Da Linha">
             <DockPanel>
                 <UniformGrid DockPanel.Dock="Top" Rows="1" HorizontalAlignment="Left">
-                    <Button Margin="3" Command="{Binding AdicionarLinha}">
+                    <Button Margin="3" Command="{Binding AdicionarItemLinha}">
                         <StackPanel>
                             <TextBlock Margin="3" HorizontalAlignment="Center" Text="Adicionar" TextWrapping="Wrap"/>
                         </StackPanel>
@@ -96,11 +96,9 @@
                         </StackPanel>
                     </Button>
                 </UniformGrid>
-                <DataGrid
-                        x:Name="dgItensLinha" Margin="3" AlternatingRowBackground="LightGray" AutoGenerateColumns="False"
-                        IsReadOnly="True"
-                        ItemsSource="{Binding ItensLinha}"
-                        SelectedItem="{Binding ItemLinha}"
+                <DataGrid x:Name="dgItensLinha" Margin="3" AlternatingRowBackground="LightGray" AutoGenerateColumns="False" IsReadOnly="True" 
+                        ItemsSource="{Binding ItemsLinhas}"  
+                          SelectedItem="{Binding ItemLinha}"
                         SelectionMode="Extended">
                     <DataGrid.Resources>
                         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="LightBlue" />

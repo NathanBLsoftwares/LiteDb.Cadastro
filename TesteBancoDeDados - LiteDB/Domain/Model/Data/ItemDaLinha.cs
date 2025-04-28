@@ -1,17 +1,20 @@
 ﻿using LiteDB;
 using TesteBancoDeDados___LiteDB.Mappers;
 
-namespace TesteBancoDeDados___LiteDB.Domain.Model.Data;
-
-internal class ItemDaLinha
+namespace TesteBancoDeDados___LiteDB.Domain.Model.Data
 {
-    [BsonId]
-    public int Id { get; set; }
-    public string Nome { get; set; }
-    [BsonRef($"{MapDataBase.Linha}")]
-    public Linha Linha { get; set; }
-    public override string ToString()
+    internal class ItemDaLinha
     {
-        return Nome;
+        [BsonId]
+        public int Id { get; set; }
+        public string Nome { get; set; }
+        [BsonRef($"{MapDataBase.Linha}")]
+        public Linha Linha { get; set; }
+        public override string ToString()
+        {
+            return Nome;
+        }
     }
 }
+
+
