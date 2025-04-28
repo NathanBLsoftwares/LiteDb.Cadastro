@@ -9,7 +9,7 @@
         Height="250" Width="250">
     <StackPanel Margin="10" Orientation="Vertical">
         <TextBlock Margin="3" Text="Nome" TextWrapping="Wrap" />
-        <TextBox Margin="3" Text="{Binding Nome, UpdateSourceTrigger=PropertyChanged}" />
+        <TextBox Margin="3" Text="{Binding NomeLinha, UpdateSourceTrigger=PropertyChanged}" />
         <TextBlock Margin="3" Text="Tipo de Linha" TextWrapping="Wrap" />
         <ComboBox Margin="3" ItemsSource="{Binding Tipos}" SelectedItem="{Binding Tipo}">
             <ComboBox.ItemTemplate>
@@ -22,7 +22,7 @@
         <TextBox Margin="3" IsReadOnly="True" Text="{Binding Grupo.Nome}" />
         <CheckBox Margin="3" Content="Linha Preferencial" IsChecked="{Binding LinhaPreferencial}" />
 
-        <Button Margin="3" Command="{Binding SalvarCmd}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+        <Button Margin="3" Command="{Binding SalvarLinha}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
             <StackPanel Orientation="Horizontal">
                 <Image Height="20" Margin="3" Source="/Images/Salvar.png" />
                 <TextBlock Margin="3" VerticalAlignment="Center" Text="Salvar" TextWrapping="Wrap" />

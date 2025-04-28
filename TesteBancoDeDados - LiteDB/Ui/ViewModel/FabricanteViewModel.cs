@@ -6,6 +6,7 @@ namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
 internal class FabricanteViewModel : BindableBase
 {
+    #region ATRIBUTOS E PROPRIEDADES
 
     private ILiteCollection<Fabricante> fabricantes;
     private Fabricante fabricanteSelecionado;
@@ -13,19 +14,21 @@ internal class FabricanteViewModel : BindableBase
     private string nome;
 
 
-
     public bool SalvouComSucesso { get; private set; } = false;
     public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(ExecuteSalvar));
     public string Nome { get => nome; set => SetProperty(ref nome, value); }
 
+    #endregion ATRIBUTOS E PROPRIEDADES
 
-
+    #region CONSTRUTORA
     public FabricanteViewModel(ILiteCollection<Fabricante> fabricantes, Fabricante fabricante = null)
     {
         this.fabricantes = fabricantes;
         fabricanteSelecionado = fabricante;
     }
+    #endregion CONSTRUTORA
 
+    #region COMANDO SALVAR
     void ExecuteSalvar(Domain.Library.Services.Dialog.IDialogService service)
     {
         if (service == null)
@@ -64,6 +67,6 @@ internal class FabricanteViewModel : BindableBase
             service.DialogResult = true;
             service.Close();
         }
-
     }
+    #endregion COMANDO SALVAR
 }

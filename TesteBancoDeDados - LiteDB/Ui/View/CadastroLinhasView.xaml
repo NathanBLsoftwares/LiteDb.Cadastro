@@ -78,7 +78,7 @@
                         <TextBlock Margin="3" HorizontalAlignment="Center" Text="Adicionar" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <ComboBox Margin="3" DisplayMemberPath="Name" ItemsSource="{Binding Linhas}" SelectedItem="{Binding Linha}"/>
+                <ComboBox Margin="3" ItemsSource="{Binding Linhas}" SelectedItem="{Binding Linha}"/>
             </DockPanel>
         </GroupBox>
 

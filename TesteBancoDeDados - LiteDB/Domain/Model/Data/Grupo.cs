@@ -12,7 +12,6 @@ namespace TesteBancoDeDados___LiteDB.Domain.Model.Data
         [BsonRef ($"{MapDataBase.Fabricante}")]
         public Fabricante Fabricante { get; set; }
 
-
         public override string ToString()
         {
             return Nome;

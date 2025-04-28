@@ -6,24 +6,33 @@ namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
 internal class GrupoViewModel : BindableBase
 {
-    private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
+    #region PROPRIEDADES E ATRIBUTOS
+
     private ILiteCollection<Grupo>? gruposDB;
+    private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
     private Grupo? gruposSelecionados;
+    private Fabricante fabricante;
     private string nomeGrupo;
+    
 
 
+    public Fabricante FabricanteSelecionado { get => fabricante; private set => fabricante = value; }
     public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(SalvarGrupos));
     public bool SalvouGrupoComSuceso { get; private set; } = false;
     public string NomeGrupo { get => nomeGrupo; set => SetProperty(ref nomeGrupo, value); }
 
+    #endregion PROPRIEDADES E ATRIBUTOS
 
-
-    public GrupoViewModel(ILiteCollection<Grupo> _grupoDB, Grupo _grupo = null)
+    #region CONSTRUTORA
+    public GrupoViewModel(ILiteCollection<Grupo> _grupoDB, Fabricante fabricante, Grupo _grupo = null)
     {
         this.gruposDB = _grupoDB;
         gruposSelecionados = _grupo;
+        FabricanteSelecionado = fabricante;
     }
+    #endregion CONSTRUTORA
 
+    #region COMANDO SALVAR
     private void SalvarGrupos(Domain.Library.Services.Dialog.IDialogService service)
     {
         if (service == null)
@@ -54,11 +63,15 @@ internal class GrupoViewModel : BindableBase
             }
             else
             {
-                gruposDB.Insert(new Grupo { Nome = nomeGrupo });
+                var grupo = new Grupo();
+                grupo.Fabricante = FabricanteSelecionado;
+                grupo.Nome = nomeGrupo;
+                gruposDB.Insert(grupo);
             }
             SalvouGrupoComSuceso = true;
             service.DialogResult = true;
             service.Close();
         }
     }
+    #endregion COMANDO SALVAR
 }

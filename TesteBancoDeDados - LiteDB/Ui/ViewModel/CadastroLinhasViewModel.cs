@@ -20,8 +20,18 @@ internal class CadastroLinhasViewModel : BindableBase
     public ILiteCollection<Fabricante> FabricantesDb { get; private set; }
     
     public ObservableCollection<Fabricante> Fabricantes { get; set; }
-    public Fabricante Fabricante { get => fabricante; set => fabricante = value; }
-
+    public Fabricante Fabricante
+    {
+        get { return fabricante; }
+        set 
+        { 
+            SetProperty(ref fabricante, value); 
+            if (value != null)
+            {
+                CarregarGruposDB(value);
+            }
+        }
+    }
 
 
     public DelegateCommand BotaoAdicionarFabricante => botaoAdicionarFabricante ?? (botaoAdicionarFabricante = new DelegateCommand(AdicionarFabricante));
@@ -39,8 +49,16 @@ internal class CadastroLinhasViewModel : BindableBase
 
     public ILiteCollection<Grupo> GruposDb { get; private set; }
     public ObservableCollection<Grupo> Grupos { get; private set; }
-    public Grupo Grupo { get => grupo; set => grupo = value; }
-
+    public Grupo Grupo
+    
+    {
+        get { return grupo; }
+        set 
+        { 
+            SetProperty(ref grupo, value);
+            CarregarLinhasDB(value);
+        }
+    }
 
     public DelegateCommand BotaoAdicionarGrupo => botaoAdicionarGrupo ?? (botaoAdicionarGrupo = new DelegateCommand(AdicionarGrupo));
     public DelegateCommand BotaoExcluirGrupo => botaoExcluirGrupo ?? (botaoExcluirGrupo = new DelegateCommand(ExcluirGrupo));
@@ -51,16 +69,16 @@ internal class CadastroLinhasViewModel : BindableBase
     private DelegateCommand botaoAdicionarLinha;
     private DelegateCommand botaoExcluirLinha;
     private DelegateCommand botaoEditarLinha;
-    private Linha linha;
+    private Linha linhaSelecionada;
 
 
     public ILiteCollection<Linha> LinhasDb { get; private set; }
     public ObservableCollection<Linha> Linhas { get; private set; }
-    public Linha Linha { get => linha; set => linha = value; }
+    public Linha LinhaSelecionada { get => linhaSelecionada; set => linhaSelecionada = value; }
 
 
     public DelegateCommand BotaoAdicionarLinha => botaoAdicionarLinha ?? (botaoAdicionarLinha = new DelegateCommand(AdicionarLinha));
-    public DelegateCommand BotaoEditarLinha => botaoEditarLinha ?? (botaoEditarLinha = new DelegateCommand(ExecuteBotaoEditarLinha));
+    public DelegateCommand BotaoEditarLinha => botaoEditarLinha ?? (botaoEditarLinha = new DelegateCommand(EditarLinha));
     public DelegateCommand BotaoExcluirLinha => botaoExcluirLinha ?? (botaoExcluirLinha = new DelegateCommand(ExcluirLinha));
    
 
@@ -87,16 +105,19 @@ internal class CadastroLinhasViewModel : BindableBase
     #endregion CONSTRUTORA E DESTRUTORA
 
     #region CARREGAR BANCO DE DADOS
-    public void CarregarLinhasDB()
+    public void CarregarLinhasDB(Grupo grupo = null)
     {
         Linhas.Clear();
-        linha = null;
+        LinhaSelecionada = null;
         LinhasDb = Db.GetCollection<Linha>(Mappers.MapDataBase.Linha);
         if(LinhasDb.Count() > 0)
         {
             foreach(var item in LinhasDb.FindAll())
             {
-                Linhas.Add(item);
+                if (grupo != null && item.Grupo.Id == grupo.Id)
+                {
+                    Linhas.Add(item);
+                }
             }
         }
     }
@@ -117,16 +138,19 @@ internal class CadastroLinhasViewModel : BindableBase
         Fabricante = Fabricantes.FirstOrDefault();
     }
 
-    private void CarregarGruposDB()
+    private void CarregarGruposDB(Fabricante fabricante = null)
     {
         Grupos.Clear();
         Grupo = null!;
         GruposDb = Db.GetCollection<Grupo>(Mappers.MapDataBase.Grupo);
         if(GruposDb.Count() > 0)
         {
-            foreach(var item in GruposDb.FindAll())
+            foreach(Grupo item in GruposDb.FindAll())
             {
-                Grupos.Add(item);
+                if (fabricante != null && item.Fabricante.Id == fabricante.Id)
+                {
+                    Grupos.Add(item);
+                }
             }        
         }
         Grupo = Grupos.FirstOrDefault();
@@ -190,26 +214,14 @@ internal class CadastroLinhasViewModel : BindableBase
     #endregion COMANDOS FABRICANTES
 
     #region COMANDOS GRUPOS
-    void AdicionarGrupo()
-    {
-        var dc = new GrupoViewModel(GruposDb);
-        var dlg = new GrupoView { DataContext = dc };
-        dlg.ShowDialog();
-        if (dc.SalvouGrupoComSuceso)
-        {
-            var novoGrupo = GruposDb.FindOne(x => x.Nome == dc.NomeGrupo);
-            if(novoGrupo != null)
-                Grupos.Add(novoGrupo);
-        }
-    }
-  
+    
     void EditarGrupo()
     {
         if( Grupo == null)
         {
             return;
         }
-        var dc = new GrupoViewModel(GruposDb, Grupo!)
+        var dc = new GrupoViewModel(GruposDb, Fabricante, Grupo!)
         {
             NomeGrupo = Grupo!.Nome
         };
@@ -238,26 +250,76 @@ internal class CadastroLinhasViewModel : BindableBase
             Grupo = null;
         }
     }
+
+    void AdicionarGrupo()
+    {
+        if (Fabricante == null)
+        {
+            MessageBox.Show("Selecione um Fabricante", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var dc = new GrupoViewModel(GruposDb, Fabricante);
+        var dlg = new GrupoView { DataContext = dc };
+        dlg.ShowDialog();
+        if (dc.SalvouGrupoComSuceso)
+        {
+            var novoGrupo = GruposDb.FindOne(x => x.Nome == dc.NomeGrupo);
+            if (novoGrupo != null)
+                Grupos.Add(novoGrupo);
+        }
+    }
+
     #endregion COMANDOS GRUPOS
 
     #region COMANDOS LINHA
-
-
-    void ExecuteBotaoEditarLinha()
+    void AdicionarLinha()
     {
+        if(Grupo == null)
+        {
+            MessageBox.Show("Selecione um Grupo", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var dc = new LinhaViewModel(LinhasDb, Grupo);
+        var dlg = new LinhaView {  DataContext = dc };
+        dlg.ShowDialog();
+        if (dc.SalvouLinhaCoMSucesso)
+        {
+            var novaLinha = LinhasDb.FindOne(linha => linha.Nome == dc.NomeLinha);
+            if (novaLinha != null)
+                Linhas.Add(novaLinha);
+        }
+    }
 
+    void EditarLinha()
+    {
+        if (LinhaSelecionada == null)
+            return;
+        var dc = new LinhaViewModel(LinhasDb, Grupo, LinhaSelecionada)
+        {
+            NomeLinha = LinhaSelecionada.Nome
+        };
+        var dlg = new LinhaView { DataContext = dc };
+        if (dlg.ShowDialog() != true)
+            return;
+        CarregarLinhasDB();
     }
 
     void ExcluirLinha()
     {
-
+        if (LinhaSelecionada == null)
+            return;
+        var resultadoExcluirLinha = MessageBox.Show($"Tem certeza que deseja Excluir a linha '{LinhaSelecionada}'?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Warning);
+        if(resultadoExcluirLinha == MessageBoxResult.Yes)
+        {
+            LinhasDb.Delete(LinhaSelecionada.Id);
+            var linhaRemovida = Linhas.FirstOrDefault(x => x.Nome == LinhaSelecionada.Nome);
+            if(linhaRemovida != null)
+            {
+                Linhas.Remove(linhaRemovida);
+            }
+            LinhaSelecionada = null;
+        }
     }
     
-
-    void AdicionarLinha()
-    {
-
-    }
-
     #endregion COMANDOS LINHA
 }
