@@ -22,7 +22,8 @@
         <TextBox Margin="3" IsReadOnly="True" Text="{Binding Grupo.Nome}" />
         <CheckBox Margin="3" Content="Linha Preferencial" IsChecked="{Binding LinhaPreferencial}" />
 
-        <Button Margin="3" Command="{Binding SalvarLinha}" CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
+        <Button Margin="3" Command="{Binding SalvarLinha}"
+                CommandParameter="{Binding RelativeSource={RelativeSource Mode=FindAncestor, AncestorType=Window}}">
             <StackPanel Orientation="Horizontal">
                 <Image Height="20" Margin="3" Source="/Images/Salvar.png" />
                 <TextBlock Margin="3" VerticalAlignment="Center" Text="Salvar" TextWrapping="Wrap" />

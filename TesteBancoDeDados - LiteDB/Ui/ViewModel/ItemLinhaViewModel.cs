@@ -1,79 +1,88 @@
-﻿using LiteDB;
-using System.Windows;
+﻿using System.Text;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
+using TesteBancoDeDadosLiteDB.Domain.Model;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
 internal class ItemLinhaViewModel : BindableBase
 {
-    #region ATRIBUTOS E PROPRIEDADES
-    private ILiteCollection<ItemDaLinha>? itemDaLinhaDB;
+
     private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvarItemCadastrado;
-    private ItemDaLinha? itemDaLinhaSelecionado;
     private Linha? linhaSelecionada;
+    private IEnumerable<ETipoItem> tipoDoItemDaLinhaSelecionado;
     private string? nomeItemDalinha;
-    
 
 
 
+    public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> SalvarItemCadastrado => salvarItemCadastrado ?? (salvarItemCadastrado = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(SalvarItemCadastradoandName));
 
-    public ILiteCollection<ItemDaLinha> ItemDaLinhaDB { get { return itemDaLinhaDB!; } set { SetProperty(ref itemDaLinhaDB, value); } }
-    public Linha LinhaSelecionada { get { return linhaSelecionada!; } set { SetProperty(ref linhaSelecionada, value); } }
-    public string NomeItemDalinha { get { return nomeItemDalinha!; } set { SetProperty(ref nomeItemDalinha, value); } }
-    public ItemDaLinha ItemDaLinhaSelecionado { get { return itemDaLinhaSelecionado!; } set { SetProperty(ref itemDaLinhaSelecionado, value); } }
-    public bool SalvouItemLinhaCoMSucesso { get; private set; } = false;
-    public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> CommSalvarItemCadastradoandName => salvarItemCadastrado ?? (salvarItemCadastrado = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(SalvarItemCadastradoandName));
-    #endregion ATRIBUTOS E PROPRIEDADES
+
+    public IEnumerable<ItemDaLinha>? ItemsDasLinhas { get; }
+    public bool Editar { get; }
+
+
+    public IEnumerable<ETipoItem> TipoDoItemDaLinhaSelecionado
+    {
+        get { return tipoDoItemDaLinhaSelecionado; }
+        set { SetProperty(ref tipoDoItemDaLinhaSelecionado, value); }
+    }
+
+
+    public Linha LinhaSelecionada
+    {
+        get
+        {
+            return linhaSelecionada!;
+        }
+
+        set
+        {
+            if (linhaSelecionada != value)
+            {
+                linhaSelecionada = value;
+                RaisePropertyChanged(nameof(linhaSelecionada));
+            }
+        }
+    }
+
+
+    public string NomeItemDalinha
+    {
+        get
+        {
+            return nomeItemDalinha!;
+        }
+        set { SetProperty(ref nomeItemDalinha, value); }
+    }
 
 
     #region CONSTRUTORA
-    public ItemLinhaViewModel(ILiteCollection<ItemDaLinha> _ItemDaLinhaDB, Linha _LinhaPertencente, ItemDaLinha _ItemDaLinha = null)
+    public ItemLinhaViewModel(IEnumerable<ItemDaLinha> _itemsDasLinhas, Linha _linha, bool _editar = false)
     {
-        ItemDaLinhaDB = _ItemDaLinhaDB;
-        LinhaSelecionada = _LinhaPertencente;
-        ItemDaLinhaSelecionado = _ItemDaLinha;
-
+        TipoDoItemDaLinhaSelecionado = Enum.GetValues(typeof(ItemDaLinha)).Cast<ItemDaLinha>();
+        ItemsDasLinhas = _itemsDasLinhas;
+        LinhaSelecionada = _linha;
+        Editar = _editar;
     }
     #endregion CONSTRUTORA
 
     #region COMANDO SALVAR
     void SalvarItemCadastradoandName(Domain.Library.Services.Dialog.IDialogService service)
     {
-        if (service == null)
-            return;
-        else
+        var ret = true;
+        var sb = new StringBuilder();
+        if (string.IsNullOrEmpty(NomeItemDalinha))
         {
-            if (string.IsNullOrEmpty(NomeItemDalinha))
-            {
-                MessageBox.Show("Todos os campos devem ser preenchidos", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            if(ItemDaLinhaDB.Exists(item => item.Nome == nomeItemDalinha))
-            {
-                MessageBox.Show("O item já existe", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            if(ItemDaLinhaSelecionado != null)
-            {
-                ItemDaLinhaSelecionado.Nome = NomeItemDalinha;
-                if (!ItemDaLinhaDB.Update(ItemDaLinhaSelecionado))
-                {
-                    MessageBox.Show("Erro ao alterar o nome do Item", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-            }
-            else
-            {
-                var itemLinha = new ItemDaLinha();
-                itemLinha.Linha = linhaSelecionada;
-                itemLinha.Nome = nomeItemDalinha;
-                ItemDaLinhaDB.Insert(itemLinha);
-            }
-            SalvouItemLinhaCoMSucesso = true;
-            service.DialogResult = true;
-            service.Close();
-
+            sb.AppendLine("O nome deve ser preenchido");
+            ret = false;
         }
+        if (!Editar && ItemsDasLinhas.Any(item => item.Nome == nomeItemDalinha ))
+        {
+            sb.AppendLine("O nome já existe no contexto atual");
+            ret = false;
+        }
+        service.DialogResult = true;
+        service.Close();
     }
     #endregion COMANDO SALVAR
 }

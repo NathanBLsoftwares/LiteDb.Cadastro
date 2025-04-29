@@ -1,4 +1,4 @@
-﻿using LiteDB;
+﻿using System.Text;
 using System.Windows;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 
@@ -7,66 +7,59 @@ namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 internal class FabricanteViewModel : BindableBase
 {
     #region ATRIBUTOS E PROPRIEDADES
-
-    private ILiteCollection<Fabricante> fabricantes;
-    private Fabricante fabricanteSelecionado;
+    public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(ExecuteSalvar));
     private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
+
+
     private string nome;
 
 
-    public bool SalvouComSucesso { get; private set; } = false;
-    public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(ExecuteSalvar));
-    public string Nome { get => nome; set => SetProperty(ref nome, value); }
+    public IEnumerable<Fabricante> Fabricantes { get; }
+    public bool Editar { get; }
 
+
+    public string Nome
+    {
+        get
+        {
+            return nome;
+        }
+        set => SetProperty(ref nome, value);
+    }
     #endregion ATRIBUTOS E PROPRIEDADES
 
     #region CONSTRUTORA
-    public FabricanteViewModel(ILiteCollection<Fabricante> fabricantes, Fabricante fabricante = null)
+    public FabricanteViewModel(IEnumerable<Fabricante> fabricantes, bool editar = false)
     {
-        this.fabricantes = fabricantes;
-        fabricanteSelecionado = fabricante;
+        Fabricantes = fabricantes;
+        Editar = editar;
     }
     #endregion CONSTRUTORA
 
     #region COMANDO SALVAR
     void ExecuteSalvar(Domain.Library.Services.Dialog.IDialogService service)
     {
-        if (service == null)
+        var ret = true;
+        var sb = new StringBuilder();
+        if (string.IsNullOrWhiteSpace(Nome))
         {
-            service.DialogResult = false;
+            sb.AppendLine("O campo Nomes deve ser preenchido!");
+            ret = false;
+        }
+        if (!Editar && Fabricantes.Any(x => x.Nome == Nome))
+        {
+            sb.AppendLine("Fabricante já Cadastrado!");
+            ret = false;
+        }
+
+        if (!ret)
+        {
+            MessageBox.Show(sb.ToString(), "Erros", MessageBoxButton.OK, MessageBoxImage.Error);
             return;
         }
-        else
-        {
-            if (string.IsNullOrWhiteSpace(Nome))
-            {
-                MessageBox.Show("O campo Nomes deve ser preenchido", "Atenção", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (fabricantes.Exists(x => x.Nome == Nome))
-            {
-                MessageBox.Show("Fabricante já Cadastrado", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
 
-            if (fabricanteSelecionado != null)
-            {
-                fabricanteSelecionado.Nome = Nome;
-                if (!fabricantes.Update(fabricanteSelecionado))
-                {
-                    MessageBox.Show("Erro ao alterar nome do Fabricante", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-            }
-            else
-            {
-                fabricantes.Insert(new Fabricante { Nome = Nome });
-            }
-
-            SalvouComSucesso = true;
-            service.DialogResult = true;
-            service.Close();
-        }
+        service.DialogResult = true;
+        service.Close();
     }
     #endregion COMANDO SALVAR
 }

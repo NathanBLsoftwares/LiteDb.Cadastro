@@ -1,5 +1,4 @@
-﻿using LiteDB;
-using System.Windows;
+﻿using System.Text;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
@@ -8,26 +7,49 @@ internal class GrupoViewModel : BindableBase
 {
     #region PROPRIEDADES E ATRIBUTOS
 
-    private ILiteCollection<Grupo>? gruposDB;
+
     private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
-    private Grupo? gruposSelecionados;
     private Fabricante fabricante;
     private string nomeGrupo;
-    
 
 
-    public Fabricante FabricanteSelecionado { get => fabricante; private set => fabricante = value; }
     public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> Salvar => salvar ?? (salvar = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(SalvarGrupos));
-    public bool SalvouGrupoComSuceso { get; private set; } = false;
-    public string NomeGrupo { get => nomeGrupo; set => SetProperty(ref nomeGrupo, value); }
+    public IEnumerable<Grupo> Grupos { get; }
+    public bool Editar { get; }
+
+
+    public string NomeGrupo
+    {
+        get
+        {
+            return nomeGrupo;
+        }
+        set => SetProperty(ref nomeGrupo, value);
+    }
+    public Fabricante FabricanteSelecionado
+    {
+        get
+        {
+            return fabricante;
+        }
+
+        set
+        {
+            if (fabricante != value)
+            {
+                fabricante = value;
+                RaisePropertyChanged(nameof(FabricanteSelecionado));
+            }
+        }
+    }
 
     #endregion PROPRIEDADES E ATRIBUTOS
 
     #region CONSTRUTORA
-    public GrupoViewModel(ILiteCollection<Grupo> _grupoDB, Fabricante fabricante, Grupo _grupo = null)
+    public GrupoViewModel(Fabricante fabricante,IEnumerable<Grupo> grupos, bool editar = false)
     {
-        this.gruposDB = _grupoDB;
-        gruposSelecionados = _grupo;
+        Editar = editar;
+        Grupos = grupos;
         FabricanteSelecionado = fabricante;
     }
     #endregion CONSTRUTORA
@@ -35,43 +57,20 @@ internal class GrupoViewModel : BindableBase
     #region COMANDO SALVAR
     private void SalvarGrupos(Domain.Library.Services.Dialog.IDialogService service)
     {
-        if (service == null)
+        var ret = true;
+        var sb = new StringBuilder();
+        if (string.IsNullOrEmpty(NomeGrupo))
         {
-            service.DialogResult = false;
+            sb.AppendLine("O campo Nome deve ser preenchido");
             return;
         }
-        else
+        if (!Editar && Grupos.Any(x => x.Nome == NomeGrupo))
         {
-            if (string.IsNullOrEmpty(nomeGrupo))
-            {
-                MessageBox.Show("O campo Nome deve ser preenchido", "Atenção", MessageBoxButton.OK, MessageBoxImage.Warning);
-                return;
-            }
-            if (gruposDB.Exists(x => x.Nome == nomeGrupo))
-            {
-                MessageBox.Show("Grupo já cadastrado", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                return;
-            }
-            if (gruposSelecionados != null)
-            {
-                gruposSelecionados.Nome = nomeGrupo;
-                if (!gruposDB.Update(gruposSelecionados))
-                {
-                    MessageBox.Show("Erro ao alterar o nome do grupo", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-            }
-            else
-            {
-                var grupo = new Grupo();
-                grupo.Fabricante = FabricanteSelecionado;
-                grupo.Nome = nomeGrupo;
-                gruposDB.Insert(grupo);
-            }
-            SalvouGrupoComSuceso = true;
-            service.DialogResult = true;
-            service.Close();
+            sb.AppendLine($"{NomeGrupo} já existe no contexto atual");
+            return;
         }
+        service.DialogResult = true;
+        service.Close();
     }
     #endregion COMANDO SALVAR
 }

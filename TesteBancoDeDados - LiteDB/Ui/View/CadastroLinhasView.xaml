@@ -106,7 +106,7 @@
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding Id}" Header="Id" />
                         <DataGridTextColumn Width="*" Binding="{Binding Nome}" Header="Nome" />
-                        <DataGridTextColumn  Header="Tipo de Item" />
+                        <DataGridTextColumn Binding="{Binding TipoDeItem}"  Header="Tipo de Item" />
                     </DataGrid.Columns>
                     <DataGrid.InputBindings>
                         <MouseBinding Command="{Binding EditarItemLinha}" CommandParameter="{Binding ElementName=dgItensLinha, Path=SelectedItems}" Gesture="LeftDoubleClick" />
