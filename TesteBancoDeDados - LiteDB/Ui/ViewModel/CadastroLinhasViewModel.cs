@@ -9,7 +9,7 @@ namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
 internal class CadastroLinhasViewModel : BindableBase
 {
-
+    #region PROPRIEDADES
     private DelegateCommand botaoAdicionarFabricante;
     private DelegateCommand botaoExcluirFabricante;
     private DelegateCommand botaoEditarFabricante;
@@ -110,7 +110,7 @@ internal class CadastroLinhasViewModel : BindableBase
         set { SetProperty(ref itemLinha, value); }
     }
 
-
+#endregion PROPRIEDADES 
 
     #region CONSTRUTORA E DESTRUTORA
     public CadastroLinhasViewModel()
@@ -218,6 +218,7 @@ internal class CadastroLinhasViewModel : BindableBase
             return;
         Fabricante.Nome = dc.Nome;
         FabricanteRepository.Update(dc.Fabricantes);
+        CarregaDadosDB();
     }
 
 

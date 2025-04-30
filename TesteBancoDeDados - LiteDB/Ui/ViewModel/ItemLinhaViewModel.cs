@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Collections.ObjectModel;
+using System.Text;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 using TesteBancoDeDadosLiteDB.Domain.Model;
 
@@ -8,25 +9,22 @@ internal class ItemLinhaViewModel : BindableBase
 {
 
     private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvarItemCadastrado;
+    private ETipoItem tipoDoItemDaLinhaSelecionado;
     private Linha? linhaSelecionada;
-    private IEnumerable<ETipoItem> tipoDoItemDaLinhaSelecionado;
     private string? nomeItemDalinha;
 
 
-
     public DelegateCommand<Domain.Library.Services.Dialog.IDialogService> SalvarItemCadastrado => salvarItemCadastrado ?? (salvarItemCadastrado = new DelegateCommand<Domain.Library.Services.Dialog.IDialogService>(SalvarItemCadastradoandName));
-
-
-    public IEnumerable<ItemDaLinha>? ItemsDasLinhas { get; }
+    public ObservableCollection<ETipoItem> TiposItemsEscolha { get; set; }
+    public IEnumerable<ItemDaLinha>? ItemsDasLinhas { get; set; }
     public bool Editar { get; }
 
 
-    public IEnumerable<ETipoItem> TipoDoItemDaLinhaSelecionado
+    public ETipoItem TipoDoItemDaLinhaSelecionado
     {
         get { return tipoDoItemDaLinhaSelecionado; }
-        set { SetProperty(ref tipoDoItemDaLinhaSelecionado, value); }
+        set {  SetProperty(ref tipoDoItemDaLinhaSelecionado, value); }
     }
-
 
     public Linha LinhaSelecionada
     {
@@ -59,7 +57,7 @@ internal class ItemLinhaViewModel : BindableBase
     #region CONSTRUTORA
     public ItemLinhaViewModel(IEnumerable<ItemDaLinha> _itemsDasLinhas, Linha _linha, bool _editar = false)
     {
-        TipoDoItemDaLinhaSelecionado = Enum.GetValues(typeof(ItemDaLinha)).Cast<ItemDaLinha>();
+        TiposItemsEscolha = new ObservableCollection<ETipoItem>(GetTipos());
         ItemsDasLinhas = _itemsDasLinhas;
         LinhaSelecionada = _linha;
         Editar = _editar;
@@ -76,13 +74,21 @@ internal class ItemLinhaViewModel : BindableBase
             sb.AppendLine("O nome deve ser preenchido");
             ret = false;
         }
-        if (!Editar && ItemsDasLinhas.Any(item => item.Nome == nomeItemDalinha ))
+        if (!Editar && ItemsDasLinhas.Any(item => item.Nome == nomeItemDalinha))
         {
             sb.AppendLine("O nome já existe no contexto atual");
             ret = false;
         }
         service.DialogResult = true;
         service.Close();
+    }
+
+    private List<ETipoItem> GetTipos()
+    {
+        var lista = new List<ETipoItem>();
+        foreach (ETipoItem tipoLinha in Enum.GetValues(typeof(ETipoItem)))
+            lista.Add(tipoLinha);
+        return lista;
     }
     #endregion COMANDO SALVAR
 }
