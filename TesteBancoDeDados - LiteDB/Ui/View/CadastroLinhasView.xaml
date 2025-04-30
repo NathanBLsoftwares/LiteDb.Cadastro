@@ -36,7 +36,7 @@
                         <TextBlock Margin="3" HorizontalAlignment="Center" Text="Adicionar" TextWrapping="Wrap"/>
                     </StackPanel>
                 </Button>
-                <ComboBox Margin="3" ItemsSource="{Binding Fabricantes}" SelectedItem="{Binding Fabricante}"/>
+                <ComboBox Margin="3" ItemsSource="{Binding Fabricantes, UpdateSourceTrigger=PropertyChanged}" SelectedItem="{Binding Fabricante, UpdateSourceTrigger=PropertyChanged}"/>
             </DockPanel>
         </GroupBox>
         

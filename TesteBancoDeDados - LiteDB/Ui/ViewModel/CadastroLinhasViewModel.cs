@@ -4,6 +4,7 @@ using System.Windows;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 using TesteBancoDeDados___LiteDB.Mappers;
 using TesteBancoDeDados___LiteDB.Ui.View;
+using TesteBancoDeDadosLiteDB.Domain.Model.Wrapper;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
@@ -21,9 +22,11 @@ internal class CadastroLinhasViewModel : BindableBase
     private DelegateCommand botaoEditarLinha;
     private DelegateCommand adicionarItemLinha;
     private DelegateCommand excluirItemLinha;
+    private DelegateCommand adicionarItem;
+    private DelegateCommand excluirItem;
 
 
-    private Fabricante fabricante;
+    private FabricanteWrapper fabricante;
     private Grupo grupo;
     private Linha linha;
     private ItemDaLinha itemLinha;
@@ -35,13 +38,15 @@ internal class CadastroLinhasViewModel : BindableBase
     public ILiteCollection<Grupo> GrupoRepository { get; private set; }
     public ILiteCollection<Linha> LinhaRepository { get; private set; }
     public ILiteCollection<ItemDaLinha> ItemDaLinhaRepository { get; private set; }
+    public ILiteCollection<Item> ItemRepository { get; private set; }
 
 
 
-    public ObservableCollection<Fabricante> Fabricantes { get; set; }
+    public ObservableCollection<FabricanteWrapper> Fabricantes { get; set; }
     public ObservableCollection<Grupo> Grupos { get; set; }
     public ObservableCollection<Linha> Linhas { get; set; }
     public ObservableCollection<ItemDaLinha> ItemsLinhas { get; set; }
+    //public ObservableCollection<Item> Itens {  get; set; }
 
 
 
@@ -56,10 +61,12 @@ internal class CadastroLinhasViewModel : BindableBase
     public DelegateCommand BotaoExcluirLinha => botaoExcluirLinha ?? (botaoExcluirLinha = new DelegateCommand(ExcluirLinha));
     public DelegateCommand AdicionarItemLinha => adicionarItemLinha ?? (adicionarItemLinha = new DelegateCommand(MAdicionarItemLinha));
     public DelegateCommand ExcluirItemLinha => excluirItemLinha ?? (excluirItemLinha = new DelegateCommand(MExcluirItemLinha));
+    public DelegateCommand AdicionarItem => adicionarItem ?? (adicionarItem = new DelegateCommand(ExecuteAdicionarItem));
+    public DelegateCommand ExcluirItem => excluirItem ?? (excluirItem = new DelegateCommand(ExecuteExcluirItem));
 
 
 
-    public Fabricante Fabricante
+    public FabricanteWrapper Fabricante
     {
         get { return fabricante; }
         set
@@ -68,7 +75,7 @@ internal class CadastroLinhasViewModel : BindableBase
             {
                 return;
             }
-            LoadGrupoByFabricante(value);
+            CarregarGruposPorFabricante(value);
         }
     }
 
@@ -82,7 +89,7 @@ internal class CadastroLinhasViewModel : BindableBase
             {
                 return;
             }
-            LoadLinhasByGrupo(value);
+            CarregarLinhaPorGrupo(value);
 
         }
     }
@@ -100,24 +107,33 @@ internal class CadastroLinhasViewModel : BindableBase
             {
                 return;
             }
-            LoadItemDaLinhsByLinhas(value);
+            CarregarItemDaLinhaPotLinha(value);
         }
     }
 
     public ItemDaLinha ItemLinha
     {
         get { return itemLinha; }
-        set { SetProperty(ref itemLinha, value); }
+
+        set
+        {
+           if(!SetProperty(ref itemLinha, value))
+            {
+                return;
+            }
+            //CarregarItemPorItemDaLinha(value);
+        }
     }
 
-#endregion PROPRIEDADES 
+    #endregion PROPRIEDADES 
+
 
     #region CONSTRUTORA E DESTRUTORA
     public CadastroLinhasViewModel()
     {
         Db = new LiteDatabase("Banco.db");
         CarregaDadosDB();
-        Fabricantes = new ObservableCollection<Fabricante>(FabricanteRepository!.FindAll());
+        Fabricantes = new ObservableCollection<FabricanteWrapper>(FabricanteRepository!.FindAll().Select(x => new FabricanteWrapper(x)));
         Grupos = new ObservableCollection<Grupo>(GrupoRepository!.FindAll());
         Linhas = new ObservableCollection<Linha>(LinhaRepository!.FindAll());
         ItemsLinhas = new ObservableCollection<ItemDaLinha>(ItemDaLinhaRepository!.FindAll());
@@ -142,7 +158,7 @@ internal class CadastroLinhasViewModel : BindableBase
         LinhaRepository = Db.GetCollection<Linha>(MapDataBase.Linha);
         ItemDaLinhaRepository = Db.GetCollection<ItemDaLinha>(MapDataBase.ItemLinha);
     }
-    private void LoadGrupoByFabricante(Fabricante value)
+    private void CarregarGruposPorFabricante(FabricanteWrapper value)
     {
         if (Grupos.Count > 0)
         {
@@ -158,7 +174,7 @@ internal class CadastroLinhasViewModel : BindableBase
             Grupos.Add(item);
         }
     }
-    private void LoadLinhasByGrupo(Grupo value)
+    private void CarregarLinhaPorGrupo(Grupo value)
     {
         if (Linhas.Count > 0)
             Linhas.Clear();
@@ -170,7 +186,7 @@ internal class CadastroLinhasViewModel : BindableBase
             Linhas.Add(item);
         }
     }
-    private void LoadItemDaLinhsByLinhas(Linha value)
+    private void CarregarItemDaLinhaPotLinha(Linha value)
     {
         if (ItemsLinhas.Count > 0)
             ItemsLinhas.Clear();
@@ -180,6 +196,16 @@ internal class CadastroLinhasViewModel : BindableBase
         foreach (var item in lista)
             ItemsLinhas.Add(item);
     }
+    //private void CarregarItemPorItemDaLinha(ItemDaLinha value)
+    //{
+    //    if (Itens.Count > 0)
+    //        Itens.Clear();
+    //    if (value == null)
+    //        return;
+    //    var lista = ItemRepository.Find(x => x.ItemLinha.Id == value.Id);
+    //    foreach (var item in lista)
+    //        Itens.Add(item);
+    //}
 
     #endregion CARREGAR BANCO DE DADOS
 
@@ -217,8 +243,7 @@ internal class CadastroLinhasViewModel : BindableBase
         if (dlg.ShowDialog() != true)
             return;
         Fabricante.Nome = dc.Nome;
-        FabricanteRepository.Update(dc.Fabricantes);
-        CarregaDadosDB();
+        FabricanteRepository.Update(Fabricante.Model);
     }
 
 
@@ -233,7 +258,7 @@ internal class CadastroLinhasViewModel : BindableBase
         }
         var novoFabricante = new Fabricante { Nome = dc.Nome };
         BsonValue ret = FabricanteRepository.Insert(novoFabricante);
-        Fabricantes.Add(novoFabricante);
+        Fabricantes.Add(new FabricanteWrapper(novoFabricante));
         Fabricante = Fabricantes.LastOrDefault()!;
     }
 
@@ -286,7 +311,7 @@ internal class CadastroLinhasViewModel : BindableBase
         var dlg = new GrupoView { DataContext = dc };
         if (dlg.ShowDialog() != true)
             return;
-        var novoGrupo = new Grupo { Nome = dc.NomeGrupo, Fabricante = Fabricante };
+        var novoGrupo = new Grupo { Nome = dc.NomeGrupo, Fabricante = Fabricante.Model };
         var ret = GrupoRepository.Insert(novoGrupo);
         Grupos.Add(novoGrupo);
         Grupo = Grupos.FirstOrDefault()!;
@@ -382,4 +407,17 @@ internal class CadastroLinhasViewModel : BindableBase
     }
     #endregion COMANDOS ITEM LINHAS
 
+    #region ITEM
+
+    void ExecuteExcluirItem()
+    {
+
+    }
+
+    void ExecuteAdicionarItem()
+    {
+
+    }
+
+    #endregion ITEM
 }

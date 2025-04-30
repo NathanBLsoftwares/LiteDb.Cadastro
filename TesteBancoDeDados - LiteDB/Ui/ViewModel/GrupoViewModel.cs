@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
+using TesteBancoDeDadosLiteDB.Domain.Model.Wrapper;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
@@ -9,7 +10,7 @@ internal class GrupoViewModel : BindableBase
 
 
     private DelegateCommand<Domain.Library.Services.Dialog.IDialogService> salvar;
-    private Fabricante fabricante;
+    private FabricanteWrapper fabricante;
     private string nomeGrupo;
 
 
@@ -26,7 +27,7 @@ internal class GrupoViewModel : BindableBase
         }
         set => SetProperty(ref nomeGrupo, value);
     }
-    public Fabricante FabricanteSelecionado
+    public FabricanteWrapper FabricanteSelecionado
     {
         get
         {
@@ -46,7 +47,7 @@ internal class GrupoViewModel : BindableBase
     #endregion PROPRIEDADES E ATRIBUTOS
 
     #region CONSTRUTORA
-    public GrupoViewModel(Fabricante fabricante,IEnumerable<Grupo> grupos, bool editar = false)
+    public GrupoViewModel(FabricanteWrapper fabricante,IEnumerable<Grupo> grupos, bool editar = false)
     {
         Editar = editar;
         Grupos = grupos;

@@ -1,6 +1,6 @@
 ﻿using System.Text;
 using System.Windows;
-using TesteBancoDeDados___LiteDB.Domain.Model.Data;
+using TesteBancoDeDadosLiteDB.Domain.Model.Wrapper;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
@@ -14,7 +14,7 @@ internal class FabricanteViewModel : BindableBase
     private string nome;
 
 
-    public IEnumerable<Fabricante> Fabricantes { get; }
+    public IEnumerable<FabricanteWrapper> Fabricantes { get; }
     public bool Editar { get; }
 
 
@@ -29,7 +29,7 @@ internal class FabricanteViewModel : BindableBase
     #endregion ATRIBUTOS E PROPRIEDADES
 
     #region CONSTRUTORA
-    public FabricanteViewModel(IEnumerable<Fabricante> fabricantes, bool editar = false)
+    public FabricanteViewModel(IEnumerable<FabricanteWrapper> fabricantes, bool editar = false)
     {
         Fabricantes = fabricantes;
         Editar = editar;
