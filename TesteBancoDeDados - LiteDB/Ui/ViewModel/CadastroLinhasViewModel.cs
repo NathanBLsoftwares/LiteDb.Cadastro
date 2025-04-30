@@ -1,10 +1,13 @@
 ﻿using LiteDB;
+using Microsoft.VisualStudio.Services.DelegatedAuthorization;
 using System.Collections.ObjectModel;
 using System.Windows;
 using TesteBancoDeDados___LiteDB.Domain.Model.Data;
 using TesteBancoDeDados___LiteDB.Mappers;
 using TesteBancoDeDados___LiteDB.Ui.View;
 using TesteBancoDeDadosLiteDB.Domain.Model.Wrapper;
+using TesteBancoDeDadosLiteDB.Ui.View;
+using TesteBancoDeDadosLiteDB.Ui.ViewModel;
 
 namespace TesteBancoDeDados___LiteDB.Ui.ViewModel;
 
@@ -30,6 +33,7 @@ internal class CadastroLinhasViewModel : BindableBase
     private Grupo grupo;
     private Linha linha;
     private ItemDaLinha itemLinha;
+    private Item item;
 
 
 
@@ -46,7 +50,7 @@ internal class CadastroLinhasViewModel : BindableBase
     public ObservableCollection<Grupo> Grupos { get; set; }
     public ObservableCollection<Linha> Linhas { get; set; }
     public ObservableCollection<ItemDaLinha> ItemsLinhas { get; set; }
-    //public ObservableCollection<Item> Itens {  get; set; }
+    public ObservableCollection<Item> Itens { get; set; }
 
 
 
@@ -121,7 +125,16 @@ internal class CadastroLinhasViewModel : BindableBase
             {
                 return;
             }
-            //CarregarItemPorItemDaLinha(value);
+            CarregarItemPorItemDaLinha(value);
+        }
+    }
+    public Item Item
+    {
+        get { return Item; }
+        set
+        {
+            if (SetProperty(ref item, value))
+                return;
         }
     }
 
@@ -137,11 +150,13 @@ internal class CadastroLinhasViewModel : BindableBase
         Grupos = new ObservableCollection<Grupo>(GrupoRepository!.FindAll());
         Linhas = new ObservableCollection<Linha>(LinhaRepository!.FindAll());
         ItemsLinhas = new ObservableCollection<ItemDaLinha>(ItemDaLinhaRepository!.FindAll());
+        Itens = new ObservableCollection<Item>(ItemRepository!.FindAll());
 
         Fabricante = Fabricantes.FirstOrDefault()!;
         Grupo = Grupos.FirstOrDefault()!;
         Linha = Linhas.FirstOrDefault()!;
         ItemLinha = ItemsLinhas.FirstOrDefault()!;
+        Item = Itens.FirstOrDefault()!;
     }
 
     ~CadastroLinhasViewModel()
@@ -157,6 +172,7 @@ internal class CadastroLinhasViewModel : BindableBase
         GrupoRepository = Db.GetCollection<Grupo>(MapDataBase.Grupo);
         LinhaRepository = Db.GetCollection<Linha>(MapDataBase.Linha);
         ItemDaLinhaRepository = Db.GetCollection<ItemDaLinha>(MapDataBase.ItemLinha);
+        ItemRepository = Db.GetCollection<Item>(MapDataBase.Item);
     }
     private void CarregarGruposPorFabricante(FabricanteWrapper value)
     {
@@ -196,16 +212,16 @@ internal class CadastroLinhasViewModel : BindableBase
         foreach (var item in lista)
             ItemsLinhas.Add(item);
     }
-    //private void CarregarItemPorItemDaLinha(ItemDaLinha value)
-    //{
-    //    if (Itens.Count > 0)
-    //        Itens.Clear();
-    //    if (value == null)
-    //        return;
-    //    var lista = ItemRepository.Find(x => x.ItemLinha.Id == value.Id);
-    //    foreach (var item in lista)
-    //        Itens.Add(item);
-    //}
+    private void CarregarItemPorItemDaLinha(ItemDaLinha value)
+    {
+        if (Itens.Count > 0)
+            Itens.Clear();
+        if (value == null)
+            return;
+        var lista = ItemRepository.Find(x => x.ItemLinha.Id == value.Id);
+        foreach (var item in lista)
+            Itens.Add(item);
+    }
 
     #endregion CARREGAR BANCO DE DADOS
 
@@ -257,7 +273,7 @@ internal class CadastroLinhasViewModel : BindableBase
             return;
         }
         var novoFabricante = new Fabricante { Nome = dc.Nome };
-        BsonValue ret = FabricanteRepository.Insert(novoFabricante);
+        var ret = FabricanteRepository.Insert(novoFabricante);
         Fabricantes.Add(new FabricanteWrapper(novoFabricante));
         Fabricante = Fabricantes.LastOrDefault()!;
     }
@@ -411,12 +427,34 @@ internal class CadastroLinhasViewModel : BindableBase
 
     void ExecuteExcluirItem()
     {
-
+        if (Linha == null)
+            return;
+        var resultadoExcluir = MessageBox.Show($"Tem certeza que deseja excluir o item '{item}' ?", "Atenção", MessageBoxButton.YesNo, MessageBoxImage.Information);
+        if(resultadoExcluir == MessageBoxResult.Yes)
+        {
+            ItemRepository.Delete(Item.Id);
+            var itemRemovida = Itens.First(x => x.Nome == Item.Nome);
+            if(Item != null) 
+                Itens.Remove(itemRemovida);
+            item = null;
+        }
     }
 
     void ExecuteAdicionarItem()
     {
-
+        if(ItemLinha == null)
+        {
+            MessageBox.Show("Selecione um item Da Linha primeiro", "Atenção", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+        var dc = new ItemViewModel(Itens, itemLinha);
+        var dlg = new ItemView { DataContext = dc };
+        if (dlg.ShowDialog() != true)
+            return;
+        var novoItem = new Item { Nome = dc.NomeItem, ItemLinha = dc.ItemDaLinhaSelecionada, Diametro = dc.DiametroItem };
+        var ret = ItemRepository.Insert(novoItem);
+        Itens.Add(novoItem);
+        Item = Itens.FirstOrDefault();
     }
 
     #endregion ITEM

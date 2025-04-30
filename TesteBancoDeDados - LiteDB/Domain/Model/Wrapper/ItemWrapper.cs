@@ -23,10 +23,10 @@ namespace TesteBancoDeDadosLiteDB.Domain.Model.Wrapper
             get { return Model.ItemLinha; }
             set { SetValue<ItemDaLinha>(value); }
         }
-        public DiametroTipo Diametro
+        public EDiametros Diametro
         {
             get { return Model.Diametro; }
-            set { SetValue<DiametroTipo>(value); }
+            set { SetValue<EDiametros>(value); }
         }
         public Bloco Blocos
         {

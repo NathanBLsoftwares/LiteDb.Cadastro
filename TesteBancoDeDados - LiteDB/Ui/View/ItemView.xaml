@@ -42,7 +42,8 @@
                     </DataGrid.InputBindings>
                     <DataGrid.Columns>
                         <DataGridTextColumn Binding="{Binding Id}" Header="Id" />
-                        <DataGridTextColumn Binding="{Binding Nome}" Header="Nome" />
+                        <DataGridTextColumn Width="*" Binding="{Binding Nome}" Header="Nome" />
+                        <DataGridTextColumn Binding="{Binding Diametro}" Header="Diâmetro"/>
                     </DataGrid.Columns>
                 </DataGrid>
             </DockPanel>
